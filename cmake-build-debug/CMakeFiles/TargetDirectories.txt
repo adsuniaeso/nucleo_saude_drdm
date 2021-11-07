@@ -1,0 +1,3 @@
+C:/Faculdade/C/nucleo_saude_drdm/cmake-build-debug/CMakeFiles/nucleo_saude_drdm.dir
+C:/Faculdade/C/nucleo_saude_drdm/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Faculdade/C/nucleo_saude_drdm/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2021.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\nucleo_saude_drdm.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\ar.exe cr CMakeFiles\nucleo_saude_drdm.dir/objects.a @CMakeFiles\nucleo_saude_drdm.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\nucleo_saude_drdm.dir/objects.a -Wl,--no-whole-archive -o nucleo_saude_drdm.exe -Wl,--out-implib,libnucleo_saude_drdm.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\nucleo_saude_drdm.dir\linklibs.rsp
