@@ -1,16 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <windows.h>
 
 typedef struct {
-    char cpf[14], nome[50], dataNascimento[10];
+    char dia[2], mes[2], ano[4];
+} Data;
+
+typedef struct {
+    char cpf[11], nome[30];
+    Data data_nascimento;
 } Dependente;
 
 typedef struct {
-    char cpf[14], nome[50], email[50], data_nascimento[10], telefone[14], data_vencimento[10];
+    char cpf[11], nome[30], email[30], telefone[11];
     int sexo, plano;
     float valorPlano;
-    Dependente dependentes[];
+    Data data_nascimento, data_vencimento;
+    Dependente dependentes[10];
 } Titular;
 
 Titular titular_aux;
@@ -29,11 +36,11 @@ void inserir();
 
 void listagem();
 
-
 main() {
     int opcao;
     abre_arquivo();
     do {
+        system("cls");
         cabecalho();
         printf("\nOpcoes: \n\n");
         printf("1 - Cadastrar novo Cliente\n");
@@ -48,6 +55,7 @@ main() {
         scanf("%d", &opcao);
         switch (opcao) {
             case 1:
+                system("cls");
                 inserir();
                 break;
             case 2:
@@ -57,6 +65,7 @@ main() {
 //                remover();
                 break;
             case 4:
+                system("cls");
                 listagem();
                 break;
             case 5:
@@ -76,34 +85,36 @@ main() {
 }
 
 void linha() {
-    for (int i = 1; i <= 80; i++) {
+    for (int i = 1; i <= 120; i++) {
         printf("_");
     }
-    printf("\n");
 }
 
 void cabecalho() {
-//    system("cls");
-    printf("Nucleo Saude");
+    printf("\n");
+    linha();
+    printf("                                                   Nucleo Saude\n");
     linha();
 }
 
 void abre_arquivo() {
-    base_clientes = fopen("..\\base_clientes.txt", "r+b");
-    if (base_clientes == NULL)
-        base_clientes = fopen("..\\base_clientes.txt", "w+b");
+    base_clientes = fopen("..\\base_clientes.bin", "a+b");
 }
 
 Dependente popularDependente() {
     Dependente dependente;
-    printf("\n\nCadastrar novo dependente\n\n");
+    printf("\nCadastrar novo dependente\n");
     printf("\nCPF: ");
     scanf("%s", &dependente.cpf);
     printf("\nNome: ");
     fflush(stdin);
     gets(dependente.nome);
-    printf("\nData de Nascimento: ");
-    scanf("%s", &dependente.dataNascimento);
+    printf("\nData de Nascimento:\nDia(xx):");
+    scanf("%s", &dependente.data_nascimento.dia);
+    printf("\nMes(xx):");
+    scanf("%s", &dependente.data_nascimento.mes);
+    printf("\nAno(xxxx):");
+    scanf("%s", &dependente.data_nascimento.ano);
     return dependente;
 }
 
@@ -111,23 +122,30 @@ void inserir() {
     int resposta;
     int temDependente;
     do {
-        cabecalho();
-        printf("\n\nCadastrar novo Cliente\n\n");
-        printf("\nCPF: ");
+        printf("\n");
+        linha();
+        printf("                                               Cadastrar novo Cliente\n");
+        linha();
+        printf("\n\nCPF: ");
         scanf("%s", &titular_aux.cpf);
         printf("\nNome: ");
         fflush(stdin);
         gets(titular_aux.nome);
         printf("\nSexo:\n1 - Feminino\n2 - Masculino\nEscolha:");
         scanf("%d", &titular_aux.sexo);
+        printf("\nTelefone: ");
+        scanf("%s", &titular_aux.telefone);
         printf("\nE-mail: ");
-        scanf("%s", &titular_aux.email);
-        printf("\nData de Nascimento: ");
-        scanf("%s", &titular_aux.data_nascimento);
+        fflush(stdin);
+        gets(titular_aux.email);
+        printf("\nData de Nascimento:\nDia(xx):");
+        scanf("%s", &titular_aux.data_nascimento.dia);
+        printf("\nMes(xx):");
+        scanf("%s", &titular_aux.data_nascimento.mes);
+        printf("\nAno(xxxx):");
+        scanf("%s", &titular_aux.data_nascimento.ano);
         printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha:");
-        scanf("%f", &titular_aux.plano);
-        printf("\nData de Nascimento: ");
-        scanf("%f", &titular_aux.data_nascimento);
+        scanf("%d", &titular_aux.plano);
 
         int x = 0;
         do {
@@ -141,26 +159,47 @@ void inserir() {
 
         fseek(base_clientes, 0, SEEK_END);
         fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
-        printf("\n\nCliente cadastrado com sucesso!\n\n");
+        printf("\nCliente cadastrado com sucesso!\n");
         printf("\nDeseja cadastrar outro Cliente?\n1 - Sim\n0 - Nao\nResposta:");
         scanf("%d", &resposta);
+        if(resposta == 1) {
+            memset(titular_aux.dependentes, 0, sizeof(Dependente));
+        }
     } while (resposta == 1);
 }
 
 void listagem() {
-    cabecalho();
-    printf("\n\nListagem Geral\n\n\n");
+    printf("\n");
     linha();
-    printf("CPF Nome Sexo\n");
+    printf("                                                  Listagem Geral\n");
+    linha();
+    printf("CPF         Nome            Sexo Fone        Email                          Idade Plano Dependente Valor Plano Venc. do Plano\n");
     linha();
     rewind(base_clientes);
     fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+
+    SYSTEMTIME time;
+    GetSystemTime(&time);
+    int anoAtual = time.wYear;
+
     while (feof(base_clientes) == 0) {
-        if (titular_aux.sexo != 0)
-            printf("%9d %-20s %5.1f\n", titular_aux.cpf, titular_aux.nome, titular_aux.sexo);
+        if (titular_aux.sexo != 0) {
+            int idade = anoAtual - atoi(titular_aux.data_nascimento.ano);
+            int qtdDep;
+            for(qtdDep = 0; qtdDep < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
+                if(strcmp(titular_aux.dependentes[qtdDep].cpf, "")) {
+                    qtdDep++;
+                } else {
+                    break;
+                }
+            }
+            printf("%-11s %-15s %4d %-11s %-30s %5d %5d %10d %-11.2f %s/%s/%s\n", titular_aux.cpf,
+                   titular_aux.nome, titular_aux.sexo,
+                   titular_aux.telefone, titular_aux.email, idade, titular_aux.plano, qtdDep, titular_aux.valorPlano,
+                   titular_aux.data_vencimento.dia, titular_aux.data_vencimento.mes, titular_aux.data_vencimento.ano);
+        }
         fread(&titular_aux, sizeof(Titular), 1, base_clientes);
     }
-    linha();
-    printf("tecle enter para voltar ao menu...");
+    printf("\n\nTecle enter para voltar ao menu...");
     getche();
 }
