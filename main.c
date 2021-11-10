@@ -71,7 +71,8 @@ main() {
                 inserir();
                 break;
             case 2:
-//                alterar();
+                system("cls");
+                alterar();
                 break;
             case 3:
                 system("cls");
@@ -298,6 +299,7 @@ void remover() {
         cabecalho();
         linha();
         printf("\nRemover Cliente\n");
+        linha();
         printf("\n\nCPF: ");
         scanf("%s", &cpf);
         posicao = procura(cpf);
@@ -315,6 +317,39 @@ void remover() {
                 printf("\nRemocao Cancelada!\n");
         }
         printf("\nDeseja Remover Outro?\n1 - Sim\n0 - Nao\nResposta: ");
+        scanf("%d", &resposta);
+    } while (resposta == 1);
+}
+
+void alterar() {
+    int confirmar, resposta, posicao;
+    char cpf[11];
+    do {
+        cabecalho();
+        linha();
+        printf("\nAlterar Nome do Cliente\n");
+        linha();
+        printf("\n\nCPF: ");
+        scanf("%s", &cpf);
+        posicao = procura(cpf);
+        if (posicao == -1) {
+            printf("\nCliente nao encontrado!!\a");
+        } else {
+            mostre(posicao);
+            printf("\n\nAlterar o Nome do Cliente?\n1 - Sim \n0 - Nao\nResposta: ");
+            scanf("%d", &confirmar);
+            if (confirmar == 1) {
+                memset(titular_aux.nome, 0, sizeof(titular_aux.nome));
+                printf("\nNovo Nome: ");
+                scanf("%s", &titular_aux.nome);
+                fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
+                fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
+                mostre(posicao);
+                printf("\n\nNome do Cliente Alterado com Sucesso!\n");
+            } else
+                printf("\n\nAlteracao Cancelada!\n\n");
+        }
+        printf("\nDeseja Alterar Outro?\n1 - Sim \n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
     } while (resposta == 1);
 }
