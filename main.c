@@ -9,19 +9,21 @@ typedef struct {
 } Data;
 
 typedef struct {
-    char cpf[11], nome[30];
+    char nome[30];
     Data data_nascimento;
+    char cpf[11];
 } Dependente;
 
 typedef struct {
-    char cpf[11], nome[25], email[35], telefone[11];
+    char nome[25], email[35], telefone[11];
     int sexo, plano;
     float valorPlano;
     Data data_nascimento, data_vencimento;
     Dependente dependentes[10];
+    char cpf[11];
 } Titular;
 
-Titular titular_aux;
+Titular titular_aux, titular_nulo;
 
 FILE *base_clientes;
 
@@ -36,8 +38,6 @@ Dependente popularDependente();
 void inserir();
 
 void listagem();
-
-//float calculaValorPlano(Titular titular);
 
 main() {
     setlocale(LC_ALL, "Portuguese");
@@ -73,10 +73,10 @@ main() {
                 listagem();
                 break;
             case 5:
-//                listagemPorPlano();
+//                listagemPorPlano(codigoPlano);
                 break;
             case 6:
-//                listagemVencimento();
+//                listagemVencimento(dataVencimento);
                 break;
             case 0:
                 fclose(base_clientes);
@@ -91,7 +91,7 @@ main() {
 }
 
 void linha() {
-    for (int i = 1; i <= 120; i++) {
+    for (int i = 1; i <= 130; i++) {
         printf("_");
     }
 }
@@ -104,24 +104,28 @@ void cabecalho() {
 }
 
 void abre_arquivo() {
-    base_clientes = fopen("..\\base_clientes.txt", "a");
+    base_clientes = fopen("..\\base_clientes.txt", "r+b");
+    if (base_clientes == NULL)
+        base_clientes = fopen("..\\base_clientes.txt", "w+b");
+
 }
 
 Dependente popularDependente() {
+    system("cls");
     Dependente dependente;
     linha();
     printf("\nCadastrar novo dependente\n");
     linha();
-//    printf("\nCPF: ");
-//    scanf("%s", &dependente.cpf);
+    printf("\n\nCPF: ");
+    scanf("%s", &dependente.cpf);
     printf("\nNome: ");
     fflush(stdin);
     gets(dependente.nome);
-    printf("\nData de Nascimento:\nDia:");
+    printf("\nData de Nascimento:\nDia: ");
     scanf("%d", &dependente.data_nascimento.dia);
-    printf("\nMes:");
+    printf("\nMes: ");
     scanf("%d", &dependente.data_nascimento.mes);
-    printf("\nAno:");
+    printf("\nAno: ");
     scanf("%d", &dependente.data_nascimento.ano);
     return dependente;
 }
@@ -139,8 +143,8 @@ void inserir() {
         linha();
         printf("                                               Cadastrar novo Cliente\n");
         linha();
-//        printf("\n\nCPF: ");
-//        scanf("%s", &titular_aux.cpf);
+        printf("\n\nCPF: ");
+        scanf("%s", &titular_aux.cpf);
         printf("\nNome: ");
         fflush(stdin);
         gets(titular_aux.nome);
@@ -151,18 +155,18 @@ void inserir() {
         printf("\nE-mail: ");
         fflush(stdin);
         gets(titular_aux.email);
-        printf("\nData de Nascimento:\nDia:");
+        printf("\nData de Nascimento:\nDia: ");
         scanf("%d", &titular_aux.data_nascimento.dia);
-        printf("\nMes:");
+        printf("\nMes: ");
         scanf("%d", &titular_aux.data_nascimento.mes);
-        printf("\nAno:");
+        printf("\nAno: ");
         scanf("%d", &titular_aux.data_nascimento.ano);
-        printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha:");
+        printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha: ");
         scanf("%d", &titular_aux.plano);
 
         int x = 0;
         do {
-            printf("\nDeseja cadastrar um dependente?\n1 - Sim\n0 - Nao\nResposta:");
+            printf("\nDeseja cadastrar um dependente?\n1 - Sim\n0 - Nao\nResposta: ");
             scanf("%d", &temDependente);
             if (temDependente == 1) {
                 titular_aux.dependentes[x] = popularDependente();
@@ -179,7 +183,7 @@ void inserir() {
         fseek(base_clientes, 0, SEEK_END);
         fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
         printf("\nCliente cadastrado com sucesso!\n");
-        printf("\nDeseja cadastrar outro Cliente?\n1 - Sim\n0 - Nao\nResposta:");
+        printf("\nDeseja cadastrar outro Cliente?\n1 - Sim\n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
         if (resposta == 1) {
             memset(titular_aux.dependentes, 0, sizeof(Dependente));
@@ -192,7 +196,7 @@ void listagem() {
     linha();
     printf("                                                  Listagem Geral\n");
     linha();
-    printf("Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
+    printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
     rewind(base_clientes);
     fread(&titular_aux, sizeof(Titular), 1, base_clientes);
@@ -212,12 +216,16 @@ void listagem() {
                     break;
                 }
             }
-            printf("%-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n", titular_aux.nome, titular_aux.sexo,
+            printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n", titular_aux.cpf, titular_aux.nome,
+                   titular_aux.sexo,
                    titular_aux.telefone, titular_aux.email, idade, titular_aux.plano, qtdDep, titular_aux.valorPlano,
                    titular_aux.data_vencimento.dia, titular_aux.data_vencimento.mes, titular_aux.data_vencimento.ano);
         }
         fread(&titular_aux, sizeof(Titular), 1, base_clientes);
     }
-    printf("\n\nTecle enter para voltar ao menu...");
+    if(titular_aux.sexo == 0) {
+        printf("\n\nNao Existem Clientes Cadastrados !\n");
+    }
+    printf("\nTecle enter para voltar ao menu...");
     getche();
 }
