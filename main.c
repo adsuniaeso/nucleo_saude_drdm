@@ -39,6 +39,14 @@ void inserir();
 
 void listagem();
 
+int procura(char cpf[][11]);
+
+void mostre(int pos);
+
+void remover();
+
+void alterar();
+
 main() {
     setlocale(LC_ALL, "Portuguese");
     int opcao;
@@ -66,7 +74,8 @@ main() {
 //                alterar();
                 break;
             case 3:
-//                remover();
+                system("cls");
+                remover();
                 break;
             case 4:
                 system("cls");
@@ -208,24 +217,104 @@ void listagem() {
     while (feof(base_clientes) == 0) {
         if (titular_aux.sexo != 0) {
             int idade = anoAtual - titular_aux.data_nascimento.ano;
-            int qtdDep;
-            for (qtdDep = 0; qtdDep < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
-                if (strcmp(titular_aux.dependentes[qtdDep].cpf, "")) {
-                    qtdDep++;
-                } else {
-                    break;
-                }
-            }
-            printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n", titular_aux.cpf, titular_aux.nome,
+            int qtdDependentes = sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);
+            printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
+                   titular_aux.cpf,
+                   titular_aux.nome,
                    titular_aux.sexo,
-                   titular_aux.telefone, titular_aux.email, idade, titular_aux.plano, qtdDep, titular_aux.valorPlano,
-                   titular_aux.data_vencimento.dia, titular_aux.data_vencimento.mes, titular_aux.data_vencimento.ano);
+                   titular_aux.telefone,
+                   titular_aux.email,
+                   idade,
+                   titular_aux.plano,
+                   qtdDependentes,
+                   titular_aux.valorPlano,
+                   titular_aux.data_vencimento.dia,
+                   titular_aux.data_vencimento.mes,
+                   titular_aux.data_vencimento.ano);
         }
         fread(&titular_aux, sizeof(Titular), 1, base_clientes);
     }
-    if(titular_aux.sexo == 0) {
+    if (titular_aux.sexo == 0) {
         printf("\n\nNao Existem Clientes Cadastrados !\n");
     }
     printf("\nTecle enter para voltar ao menu...");
     getche();
+}
+
+int procura(char cpf[][11]) {
+    int posicao = 0;
+    rewind(base_clientes);
+    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    while (feof(base_clientes) == 0) {
+        if (strcmp(titular_aux.cpf, cpf[0]) == 0) {
+            return posicao;
+        } else {
+            fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+            posicao++;
+        }
+    }
+    return -1;
+}
+
+void mostre(int posicao) {
+    fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
+    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    system("cls");
+    printf("\n\n");
+    cabecalho();
+    linha();
+    printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
+    linha();
+
+    SYSTEMTIME time;
+    GetSystemTime(&time);
+
+    int anoAtual = time.wYear;
+
+    int idade = anoAtual - titular_aux.data_nascimento.ano;
+
+    int qtdDependentes = sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);
+
+    printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
+           titular_aux.cpf,
+           titular_aux.nome,
+           titular_aux.sexo,
+           titular_aux.telefone,
+           titular_aux.email,
+           idade,
+           titular_aux.plano,
+           qtdDependentes,
+           titular_aux.valorPlano,
+           titular_aux.data_vencimento.dia,
+           titular_aux.data_vencimento.mes,
+           titular_aux.data_vencimento.ano);
+    linha();
+}
+
+void remover() {
+    int confirmar, resposta, posicao;
+    char cpf[11];
+    do {
+        cabecalho();
+        linha();
+        printf("\nRemover Cliente\n");
+        printf("\n\nCPF: ");
+        scanf("%s", &cpf);
+        posicao = procura(cpf);
+        if (posicao == -1) {
+            printf("\nCliente nao Encontrado!!");
+        } else {
+            mostre(posicao);
+            printf("\n\nDeseja Remover o Cliente?\n1 - Sim\n0 - Nao\nResposta: ");
+            scanf("%d", &confirmar);
+            if (confirmar == 1) {
+                fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
+                fwrite(&titular_nulo, sizeof(Titular), 1, base_clientes);
+                printf("\nCliente removido com sucesso!\n");
+            } else
+                printf("\nRemocao Cancelada!\n");
+        }
+        printf("\nDeseja Remover Outro?\n1 - Sim\n0 - Nao\nResposta: ");
+        scanf("%d", &resposta);
+    } while (resposta == 1);
 }
