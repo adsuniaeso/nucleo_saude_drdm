@@ -317,7 +317,7 @@ void remover() {
         scanf("%s", &cpf);
         posicao = procura(cpf);
         if (posicao == -1) {
-            printf("\nCliente nao Encontrado!!");
+            printf("\nCliente nao Encontrado!!\n");
         } else {
             mostre(posicao);
             printf("\n\nDeseja Remover o Cliente?\n1 - Sim\n0 - Nao\nResposta: ");
@@ -344,7 +344,7 @@ void alterar() {
         scanf("%s", &cpf);
         posicao = procura(cpf);
         if (posicao == -1) {
-            printf("\nCliente nao encontrado!!\a");
+            printf("\nCliente nao encontrado!!\n");
         } else {
             mostre(posicao);
             printf("\n\nAlterar o Nome do Cliente?\n1 - Sim \n0 - Nao\nResposta: ");
