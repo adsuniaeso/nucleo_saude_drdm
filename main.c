@@ -230,7 +230,7 @@ void listagem() {
                     break;
                 }
             }
-            printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
+            printf("%-11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
                    titular_aux.cpf,
                    titular_aux.nome,
                    titular_aux.sexo,
@@ -250,8 +250,8 @@ void listagem() {
         printf("\n\nNao Existem Clientes Cadastrados !\n");
     }
     linha();
-    printf("\nTecle enter para voltar ao menu...");
-    getche();
+    printf("\n");
+    system("pause");
 }
 
 int procura(char cpf[][11]) {
