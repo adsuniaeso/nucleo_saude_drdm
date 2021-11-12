@@ -65,27 +65,27 @@ include CMakeFiles/nucleo_saude_drdm.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/nucleo_saude_drdm.dir/flags.make
 
-CMakeFiles/nucleo_saude_drdm.dir/main.c.obj: CMakeFiles/nucleo_saude_drdm.dir/flags.make
-CMakeFiles/nucleo_saude_drdm.dir/main.c.obj: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Faculdade\C\nucleo_saude_drdm\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/nucleo_saude_drdm.dir/main.c.obj"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\nucleo_saude_drdm.dir\main.c.obj -c C:\Faculdade\C\nucleo_saude_drdm\main.c
+CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj: CMakeFiles/nucleo_saude_drdm.dir/flags.make
+CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj: ../teste.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Faculdade\C\nucleo_saude_drdm\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj"
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\nucleo_saude_drdm.dir\teste.c.obj -c C:\Faculdade\C\nucleo_saude_drdm\teste.c
 
-CMakeFiles/nucleo_saude_drdm.dir/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nucleo_saude_drdm.dir/main.c.i"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Faculdade\C\nucleo_saude_drdm\main.c > CMakeFiles\nucleo_saude_drdm.dir\main.c.i
+CMakeFiles/nucleo_saude_drdm.dir/teste.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nucleo_saude_drdm.dir/teste.c.i"
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Faculdade\C\nucleo_saude_drdm\teste.c > CMakeFiles\nucleo_saude_drdm.dir\teste.c.i
 
-CMakeFiles/nucleo_saude_drdm.dir/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nucleo_saude_drdm.dir/main.c.s"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Faculdade\C\nucleo_saude_drdm\main.c -o CMakeFiles\nucleo_saude_drdm.dir\main.c.s
+CMakeFiles/nucleo_saude_drdm.dir/teste.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nucleo_saude_drdm.dir/teste.c.s"
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Faculdade\C\nucleo_saude_drdm\teste.c -o CMakeFiles\nucleo_saude_drdm.dir\teste.c.s
 
 # Object files for target nucleo_saude_drdm
 nucleo_saude_drdm_OBJECTS = \
-"CMakeFiles/nucleo_saude_drdm.dir/main.c.obj"
+"CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj"
 
 # External object files for target nucleo_saude_drdm
 nucleo_saude_drdm_EXTERNAL_OBJECTS =
 
-nucleo_saude_drdm.exe: CMakeFiles/nucleo_saude_drdm.dir/main.c.obj
+nucleo_saude_drdm.exe: CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj
 nucleo_saude_drdm.exe: CMakeFiles/nucleo_saude_drdm.dir/build.make
 nucleo_saude_drdm.exe: CMakeFiles/nucleo_saude_drdm.dir/linklibs.rsp
 nucleo_saude_drdm.exe: CMakeFiles/nucleo_saude_drdm.dir/objects1.rsp

@@ -27,6 +27,12 @@ Titular titular_aux, titular_nulo;
 
 FILE *base_clientes;
 
+SYSTEMTIME time;
+
+int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar;
+
+char cpf[11];
+
 void linha();
 
 void cabecalho();
@@ -36,6 +42,8 @@ void abre_arquivo();
 Dependente popularDependente();
 
 void inserir();
+
+//float calculaValorPlano(titular_aux);
 
 void listagem();
 
@@ -47,9 +55,13 @@ void remover();
 
 void alterar();
 
+//void listagemPorPlano();
+
+//void listagemVencimento();
+
 main() {
     setlocale(LC_ALL, "Portuguese");
-    int opcao;
+    GetSystemTime(&time);
     abre_arquivo();
     do {
         system("cls");
@@ -83,10 +95,12 @@ main() {
                 listagem();
                 break;
             case 5:
-//                listagemPorPlano(codigoPlano);
+                system("cls");
+//                listagemPorPlano();
                 break;
             case 6:
-//                listagemVencimento(dataVencimento);
+                system("cls");
+//                listagemVencimento();
                 break;
             case 0:
                 fclose(base_clientes);
@@ -115,9 +129,9 @@ void cabecalho() {
 
 void abre_arquivo() {
     base_clientes = fopen("..\\base_clientes.txt", "r+b");
-    if (base_clientes == NULL)
+    if (base_clientes == NULL) {
         base_clientes = fopen("..\\base_clientes.txt", "w+b");
-
+    }
 }
 
 Dependente popularDependente() {
@@ -141,12 +155,6 @@ Dependente popularDependente() {
 }
 
 void inserir() {
-    int resposta;
-    int temDependente;
-
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-
     do {
         system("cls");
         printf("\n");
@@ -173,7 +181,6 @@ void inserir() {
         scanf("%d", &titular_aux.data_nascimento.ano);
         printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha: ");
         scanf("%d", &titular_aux.plano);
-
         int x = 0;
         do {
             printf("\nDeseja cadastrar um dependente?\n1 - Sim\n0 - Nao\nResposta: ");
@@ -183,13 +190,10 @@ void inserir() {
             }
             x++;
         } while (temDependente == 1);
-
 //        titular_aux.valorPlano = calculaValorPlano(titular_aux);
-
         titular_aux.data_vencimento.dia = time.wDay;
         titular_aux.data_vencimento.mes = time.wMonth;
         titular_aux.data_vencimento.ano = (time.wYear + 1);
-
         fseek(base_clientes, 0, SEEK_END);
         fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
         printf("\nCliente cadastrado com sucesso!\n");
@@ -210,15 +214,22 @@ void listagem() {
     linha();
     rewind(base_clientes);
     fread(&titular_aux, sizeof(Titular), 1, base_clientes);
-
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-    int anoAtual = time.wYear;
-
     while (feof(base_clientes) == 0) {
         if (titular_aux.sexo != 0) {
-            int idade = anoAtual - titular_aux.data_nascimento.ano;
-            int qtdDependentes = sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);
+            idade = time.wYear - titular_aux.data_nascimento.ano;
+            if ((int) time.wMonth <= titular_aux.data_nascimento.mes) {
+                if ((int) time.wDay < titular_aux.data_nascimento.dia) {
+                    idade -= 1;
+                }
+            }
+            for (qtdDependentes = 0;
+                 qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
+                if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "")) {
+                    qtdDependentes++;
+                } else {
+                    break;
+                }
+            }
             printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
                    titular_aux.cpf,
                    titular_aux.nome,
@@ -238,12 +249,13 @@ void listagem() {
     if (titular_aux.sexo == 0) {
         printf("\n\nNao Existem Clientes Cadastrados !\n");
     }
+    linha();
     printf("\nTecle enter para voltar ao menu...");
     getche();
 }
 
 int procura(char cpf[][11]) {
-    int posicao = 0;
+    posicao = 0;
     rewind(base_clientes);
     fread(&titular_aux, sizeof(Titular), 1, base_clientes);
     while (feof(base_clientes) == 0) {
@@ -266,16 +278,19 @@ void mostre(int posicao) {
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
-
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-
-    int anoAtual = time.wYear;
-
-    int idade = anoAtual - titular_aux.data_nascimento.ano;
-
-    int qtdDependentes = sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);
-
+    idade = time.wYear - titular_aux.data_nascimento.ano;
+    if ((int) time.wMonth <= titular_aux.data_nascimento.mes) {
+        if ((int) time.wDay < titular_aux.data_nascimento.dia) {
+            idade -= 1;
+        }
+    }
+    for (qtdDependentes = 0; qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
+        if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "")) {
+            qtdDependentes++;
+        } else {
+            break;
+        }
+    }
     printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
            titular_aux.cpf,
            titular_aux.nome,
@@ -293,8 +308,6 @@ void mostre(int posicao) {
 }
 
 void remover() {
-    int confirmar, resposta, posicao;
-    char cpf[11];
     do {
         cabecalho();
         linha();
@@ -322,8 +335,6 @@ void remover() {
 }
 
 void alterar() {
-    int confirmar, resposta, posicao;
-    char cpf[11];
     do {
         cabecalho();
         linha();
@@ -339,9 +350,9 @@ void alterar() {
             printf("\n\nAlterar o Nome do Cliente?\n1 - Sim \n0 - Nao\nResposta: ");
             scanf("%d", &confirmar);
             if (confirmar == 1) {
-                memset(titular_aux.nome, 0, sizeof(titular_aux.nome));
                 printf("\nNovo Nome: ");
-                scanf("%s", &titular_aux.nome);
+                fflush(stdin);
+                gets(titular_aux.nome);
                 fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
                 fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
                 mostre(posicao);

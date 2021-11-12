@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/nucleo_saude_drdm.dir/main.c.obj"
+  "CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj"
   "libnucleo_saude_drdm.dll.a"
   "nucleo_saude_drdm.exe"
   "nucleo_saude_drdm.exe.manifest"

@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Faculdade/C/nucleo_saude_drdm/main.c" "C:/Faculdade/C/nucleo_saude_drdm/cmake-build-debug/CMakeFiles/nucleo_saude_drdm.dir/main.c.obj"
+  "C:/Faculdade/C/nucleo_saude_drdm/teste.c" "C:/Faculdade/C/nucleo_saude_drdm/cmake-build-debug/CMakeFiles/nucleo_saude_drdm.dir/teste.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

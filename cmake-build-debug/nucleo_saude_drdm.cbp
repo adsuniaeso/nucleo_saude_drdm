@@ -74,7 +74,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Faculdade/C/nucleo_saude_drdm/main.c">
+		<Unit filename="C:/Faculdade/C/nucleo_saude_drdm/teste.c">
 			<Option target="nucleo_saude_drdm"/>
 		</Unit>
 		<Unit filename="C:/Faculdade/C/nucleo_saude_drdm/CMakeLists.txt">
