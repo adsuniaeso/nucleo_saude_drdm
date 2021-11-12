@@ -250,7 +250,7 @@ void listagem() {
         printf("\n\nNao Existem Clientes Cadastrados !\n");
     }
     linha();
-    printf("\n");
+    printf("\n\n");
     system("pause");
 }
 
