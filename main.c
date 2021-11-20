@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
 #include <windows.h>
 #include <locale.h>
 
@@ -10,6 +9,7 @@ typedef struct {
 
 typedef struct {
     char nome[30];
+    int sexo;
     Data data_nascimento;
     char cpf[11];
 } Dependente;
@@ -23,13 +23,15 @@ typedef struct {
     char cpf[11];
 } Titular;
 
-Titular titular_aux, titular_nulo;
+Titular titular, titular_aux;
 
 FILE *base_clientes;
 
 SYSTEMTIME time;
 
-int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar;
+int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar, cpfExiste;
+
+float valorPlano;
 
 char cpf[11];
 
@@ -43,11 +45,13 @@ Dependente popularDependente();
 
 void inserir();
 
-//float calculaValorPlano(titular_aux);
+float calculaValorPlano(Titular titular);
 
 void listagem();
 
-int procura(char cpf[][11]);
+void listagemDependentes();
+
+int procura(char cpf[11]);
 
 void mostre(int pos);
 
@@ -59,7 +63,11 @@ void alterar();
 
 //void listagemVencimento();
 
-main() {
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
+int main() {
     setlocale(LC_ALL, "Portuguese");
     GetSystemTime(&time);
     abre_arquivo();
@@ -73,34 +81,32 @@ main() {
         printf("4 - Listagem Geral\n");
         printf("5 - Listagem por Plano\n");
         printf("6 - Listagem dos Vencimentos do Plano de Saude do Mes\n");
+        printf("7 - Listagem dos Dependentes por Titular\n");
         printf("0 - Sair\n");
         linha();
-        printf("Informe a opcao desejada: ");
+        printf("\n\nInforme a opcao desejada: ");
         scanf("%d", &opcao);
         switch (opcao) {
             case 1:
-                system("cls");
                 inserir();
                 break;
             case 2:
-                system("cls");
                 alterar();
                 break;
             case 3:
-                system("cls");
                 remover();
                 break;
             case 4:
-                system("cls");
                 listagem();
                 break;
             case 5:
-                system("cls");
 //                listagemPorPlano();
                 break;
             case 6:
-                system("cls");
 //                listagemVencimento();
+                break;
+            case 7:
+                listagemDependentes();
                 break;
             case 0:
                 fclose(base_clientes);
@@ -108,25 +114,38 @@ main() {
                 system("pause");
                 break;
             default:
-                printf("\n\n\aOpcao invalida!");
+                printf("\n\nOpcao invalida!");
                 break;
         }
     } while (opcao != 0);
+    return 0;
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 void linha() {
     for (int i = 1; i <= 130; i++) {
         printf("_");
     }
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 void cabecalho() {
     printf("\n");
     linha();
-    printf("                                                   Nucleo Saude\n");
+    printf("                                                            Nucleo Saude\n");
     linha();
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 void abre_arquivo() {
     base_clientes = fopen("..\\base_clientes.txt", "r+b");
     if (base_clientes == NULL) {
@@ -134,6 +153,10 @@ void abre_arquivo() {
     }
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 Dependente popularDependente() {
     system("cls");
     Dependente dependente;
@@ -145,6 +168,8 @@ Dependente popularDependente() {
     printf("\nNome: ");
     fflush(stdin);
     gets(dependente.nome);
+    printf("\nSexo:\n1 - Feminino\n2 - Masculino\nEscolha:");
+    scanf("%d", &dependente.sexo);
     printf("\nData de Nascimento:\nDia: ");
     scanf("%d", &dependente.data_nascimento.dia);
     printf("\nMes: ");
@@ -154,6 +179,10 @@ Dependente popularDependente() {
     return dependente;
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 void inserir() {
     do {
         system("cls");
@@ -161,92 +190,168 @@ void inserir() {
         linha();
         printf("                                               Cadastrar novo Cliente\n");
         linha();
-        printf("\n\nCPF: ");
-        scanf("%s", &titular_aux.cpf);
+        do {
+            cpfExiste = 0;
+            printf("\n\nCPF: ");
+            scanf("%s", &cpf);
+            rewind(base_clientes);
+            fread(&titular, sizeof(Titular), 1, base_clientes);
+            while (feof(base_clientes) == 0) {
+                if (strcmp(titular.cpf, cpf) == 0) {
+                    printf("\nCPF %s ja cadastrado! Informe um CPF diferente!", cpf);
+                    cpfExiste = 1;
+                }
+                fread(&titular, sizeof(Titular), 1, base_clientes);
+            }
+            if (cpfExiste == 0) {
+                memset(&titular, 0, sizeof(Titular));
+                strcpy(&titular.cpf, cpf);
+            }
+        } while (cpfExiste == 1);
         printf("\nNome: ");
         fflush(stdin);
-        gets(titular_aux.nome);
+        gets(titular.nome);
         printf("\nSexo:\n1 - Feminino\n2 - Masculino\nEscolha:");
-        scanf("%d", &titular_aux.sexo);
+        scanf("%d", &titular.sexo);
         printf("\nTelefone: ");
-        scanf("%s", &titular_aux.telefone);
+        scanf("%s", &titular.telefone);
         printf("\nE-mail: ");
         fflush(stdin);
-        gets(titular_aux.email);
+        gets(titular.email);
         printf("\nData de Nascimento:\nDia: ");
-        scanf("%d", &titular_aux.data_nascimento.dia);
-        printf("\nMes: ");
-        scanf("%d", &titular_aux.data_nascimento.mes);
-        printf("\nAno: ");
-        scanf("%d", &titular_aux.data_nascimento.ano);
+        scanf("%d", &titular.data_nascimento.dia);
+        printf("Mes: ");
+        scanf("%d", &titular.data_nascimento.mes);
+        printf("Ano: ");
+        scanf("%d", &titular.data_nascimento.ano);
         printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha: ");
-        scanf("%d", &titular_aux.plano);
+        scanf("%d", &titular.plano);
         int x = 0;
         do {
             printf("\nDeseja cadastrar um dependente?\n1 - Sim\n0 - Nao\nResposta: ");
             scanf("%d", &temDependente);
             if (temDependente == 1) {
-                titular_aux.dependentes[x] = popularDependente();
+                titular.dependentes[x] = popularDependente();
             }
             x++;
         } while (temDependente == 1);
-//        titular_aux.valorPlano = calculaValorPlano(titular_aux);
-        titular_aux.data_vencimento.dia = time.wDay;
-        titular_aux.data_vencimento.mes = time.wMonth;
-        titular_aux.data_vencimento.ano = (time.wYear + 1);
+        titular.valorPlano = calculaValorPlano(titular);
+        titular.data_vencimento.dia = time.wDay;
+        titular.data_vencimento.mes = time.wMonth;
+        titular.data_vencimento.ano = (time.wYear + 1);
         fseek(base_clientes, 0, SEEK_END);
-        fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
+        fwrite(&titular, sizeof(Titular), 1, base_clientes);
+        system("cls");
         printf("\nCliente cadastrado com sucesso!\n");
         printf("\nDeseja cadastrar outro Cliente?\n1 - Sim\n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
         if (resposta == 1) {
-            memset(titular_aux.dependentes, 0, sizeof(Dependente));
+            memset(titular.dependentes, 0, sizeof(Dependente));
         }
     } while (resposta == 1);
 }
 
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
+float calculaValorPlano(Titular titular) {
+    for (qtdDependentes = 0; qtdDependentes < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]);) {
+        if (strcmp(titular.dependentes[qtdDependentes].cpf, "")) {
+            qtdDependentes++;
+        } else {
+            break;
+        }
+    }
+    switch (titular.plano) {
+        case 1:
+            valorPlano = 300.00;
+            break;
+        case 2:
+            valorPlano = 400.00;
+            break;
+        case 3:
+            valorPlano = 200.00;
+            break;
+        case 4:
+            valorPlano = 500.00;
+            break;
+        default:
+            break;
+    }
+    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+    idade /= 365;
+    //Aqui faz a validação somente do titular e aplica os acréscimos e descontos
+    if (titular.sexo == 1 && (idade >= 13 && idade <= 35)) {
+        valorPlano *= (qtdDependentes + 1) * (1 + 0.30);
+    } else if (idade < 13) {
+        valorPlano *= (qtdDependentes + 1) * (1 - 0.30);
+    } else if (idade >= 60) {
+        valorPlano *= (qtdDependentes + 1) * (1 + 0.40);
+    } else {
+        valorPlano *= (qtdDependentes + 1);
+    }
+    //Aqui faz a validação de todos os dependentes do titular e aplica os acréscimos e descontos.
+    //Para o primeiro IF, tive que adicionar a variável SEXO no dependente.
+    for (int x = 0; x < qtdDependentes; x++) {
+        idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].data_nascimento.ano - 30 * titular.dependentes[x].data_nascimento.mes - titular.dependentes[x].data_nascimento.dia;
+        idade /= 365;
+        if (titular.dependentes[x].sexo == 1 && (idade >= 13 && idade <= 35)) {
+            valorPlano *= (1 + 0.30);
+        } else if (idade < 13) {
+            valorPlano *= (1 - 0.30);
+        } else if (idade >= 60) {
+            valorPlano *= (1 + 0.40);
+        }
+    }
+    if (qtdDependentes > 1) {
+        valorPlano *= (1 - 0.20);
+    }
+    return valorPlano;
+}
+
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ */
 void listagem() {
-    printf("\n");
+    system("cls");
     linha();
     printf("                                                  Listagem Geral\n");
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
     rewind(base_clientes);
-    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    fread(&titular, sizeof(Titular), 1, base_clientes);
     while (feof(base_clientes) == 0) {
-        if (titular_aux.sexo != 0) {
-            idade = time.wYear - titular_aux.data_nascimento.ano;
-            if ((int) time.wMonth <= titular_aux.data_nascimento.mes) {
-                if ((int) time.wDay < titular_aux.data_nascimento.dia) {
-                    idade -= 1;
-                }
-            }
+        if (titular.sexo != 0) {
+            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+            idade /= 365;
             for (qtdDependentes = 0;
-                 qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
-                if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "")) {
+                 qtdDependentes < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]);) {
+                if (strcmp(titular.dependentes[qtdDependentes].cpf, "") != 0) {
                     qtdDependentes++;
                 } else {
                     break;
                 }
             }
             printf("%-11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
-                   titular_aux.cpf,
-                   titular_aux.nome,
-                   titular_aux.sexo,
-                   titular_aux.telefone,
-                   titular_aux.email,
+                   titular.cpf,
+                   titular.nome,
+                   titular.sexo,
+                   titular.telefone,
+                   titular.email,
                    idade,
-                   titular_aux.plano,
+                   titular.plano,
                    qtdDependentes,
-                   titular_aux.valorPlano,
-                   titular_aux.data_vencimento.dia,
-                   titular_aux.data_vencimento.mes,
-                   titular_aux.data_vencimento.ano);
+                   titular.valorPlano,
+                   titular.data_vencimento.dia,
+                   titular.data_vencimento.mes,
+                   titular.data_vencimento.ano);
         }
-        fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+        fread(&titular, sizeof(Titular), 1, base_clientes);
     }
-    if (titular_aux.sexo == 0) {
+    if (titular.sexo == 0) {
         printf("\n\nNao Existem Clientes Cadastrados !\n");
     }
     linha();
@@ -254,64 +359,115 @@ void listagem() {
     system("pause");
 }
 
-int procura(char cpf[][11]) {
+/*
+ * Autor: Diego Assis
+ * E-mail: diego.pereira@aluno.uniaeso.edu.br
+ * OBS.: Bônus
+ */
+void listagemDependentes() {
+    system("cls");
+    cabecalho();
+    linha();
+    printf("\nInforme o CPF do Titular\n");
+    linha();
+    printf("\n\nCPF: ");
+    scanf("%s", &cpf);
+    posicao = procura(cpf);
+    fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
+    fread(&titular, sizeof(Titular), 1, base_clientes);
+    system("cls");
+    cabecalho();
+    printf("\nTitular: %s", titular.nome);
+    printf("\n");
+    linha();
+    printf("\n                                                   Listar Dependentes por Titular\n");
+    linha();
+    printf("CPF         Nome                      Sexo Idade\n");
+    linha();
+    for (int x = 0; x < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]); x++) {
+        if (strcmp(titular.dependentes[x].cpf, "") != 0) {
+            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].data_nascimento.ano - 30 * titular.dependentes[x].data_nascimento.mes - titular.dependentes[x].data_nascimento.dia;
+            idade /= 365;
+            printf("%11s %-25s %4d %-4d\n",
+                   titular.dependentes[x].cpf,
+                   titular.dependentes[x].nome,
+                   titular.dependentes[x].sexo,
+                   idade);
+        } else {
+            break;
+        }
+    }
+    linha();
+    printf("\n\n");
+    system("pause");
+}
+
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
+int procura(char cpf[11]) {
     posicao = 0;
     rewind(base_clientes);
-    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    fread(&titular, sizeof(Titular), 1, base_clientes);
     while (feof(base_clientes) == 0) {
-        if (strcmp(titular_aux.cpf, cpf[0]) == 0) {
+        if (strcmp(titular.cpf, cpf) == 0) {
             return posicao;
         } else {
-            fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+            fread(&titular, sizeof(Titular), 1, base_clientes);
             posicao++;
         }
     }
     return -1;
 }
 
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
 void mostre(int posicao) {
     fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
-    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    fread(&titular, sizeof(Titular), 1, base_clientes);
     system("cls");
-    printf("\n\n");
     cabecalho();
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
-    idade = time.wYear - titular_aux.data_nascimento.ano;
-    if ((int) time.wMonth <= titular_aux.data_nascimento.mes) {
-        if ((int) time.wDay < titular_aux.data_nascimento.dia) {
-            idade -= 1;
-        }
-    }
-    for (qtdDependentes = 0; qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
-        if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "")) {
+    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+    idade /= 365;
+    for (qtdDependentes = 0; qtdDependentes < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]);) {
+        if (strcmp(titular.dependentes[qtdDependentes].cpf, "") != 0) {
             qtdDependentes++;
         } else {
             break;
         }
     }
     printf("%11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
-           titular_aux.cpf,
-           titular_aux.nome,
-           titular_aux.sexo,
-           titular_aux.telefone,
-           titular_aux.email,
+           titular.cpf,
+           titular.nome,
+           titular.sexo,
+           titular.telefone,
+           titular.email,
            idade,
-           titular_aux.plano,
+           titular.plano,
            qtdDependentes,
-           titular_aux.valorPlano,
-           titular_aux.data_vencimento.dia,
-           titular_aux.data_vencimento.mes,
-           titular_aux.data_vencimento.ano);
+           titular.valorPlano,
+           titular.data_vencimento.dia,
+           titular.data_vencimento.mes,
+           titular.data_vencimento.ano);
     linha();
 }
 
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
 void remover() {
     do {
+        system("cls");
         cabecalho();
         linha();
-        printf("\nRemover Cliente\n");
+        printf("\n                                                          Remover Cliente\n");
         linha();
         printf("\n\nCPF: ");
         scanf("%s", &cpf);
@@ -324,21 +480,29 @@ void remover() {
             scanf("%d", &confirmar);
             if (confirmar == 1) {
                 fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
-                fwrite(&titular_nulo, sizeof(Titular), 1, base_clientes);
+                fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
+                system("cls");
                 printf("\nCliente removido com sucesso!\n");
-            } else
+            } else {
+                system("cls");
                 printf("\nRemocao Cancelada!\n");
+            }
         }
         printf("\nDeseja Remover Outro?\n1 - Sim\n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
     } while (resposta == 1);
 }
 
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
 void alterar() {
     do {
+        system("cls");
         cabecalho();
         linha();
-        printf("\nAlterar Nome do Cliente\n");
+        printf("\n                                                      Alterar Nome do Cliente\n");
         linha();
         printf("\n\nCPF: ");
         scanf("%s", &cpf);
@@ -352,13 +516,16 @@ void alterar() {
             if (confirmar == 1) {
                 printf("\nNovo Nome: ");
                 fflush(stdin);
-                gets(titular_aux.nome);
+                gets(titular.nome);
                 fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
-                fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
+                fwrite(&titular, sizeof(Titular), 1, base_clientes);
+                system("cls");
                 mostre(posicao);
-                printf("\n\nNome do Cliente Alterado com Sucesso!\n");
-            } else
-                printf("\n\nAlteracao Cancelada!\n\n");
+                printf("\nNome do Cliente Alterado com Sucesso!\n");
+            } else {
+                system("cls");
+                printf("\nAlteracao Cancelada!\n");
+            }
         }
         printf("\nDeseja Alterar Outro?\n1 - Sim \n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
