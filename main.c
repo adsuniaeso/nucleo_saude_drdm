@@ -29,7 +29,7 @@ FILE *base_clientes;
 
 SYSTEMTIME time;
 
-int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar, cpfExiste;
+int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar, cpfExiste, plano;
 
 float valorPlano;
 
@@ -59,9 +59,9 @@ void remover();
 
 void alterar();
 
-//void listagemPorPlano();
+void listagemPorPlano();
 
-//void listagemVencimento();
+void listagemVencimento();
 
 /*
  * Autor: Diego Assis
@@ -100,10 +100,10 @@ int main() {
                 listagem();
                 break;
             case 5:
-//                listagemPorPlano();
+                listagemPorPlano();
                 break;
             case 6:
-//                listagemVencimento();
+                listagemVencimento();
                 break;
             case 7:
                 listagemDependentes();
@@ -159,9 +159,10 @@ void abre_arquivo() {
  */
 Dependente popularDependente() {
     system("cls");
-    Dependente dependente;
+    cabecalho();
     linha();
-    printf("\nCadastrar novo dependente\n");
+    Dependente dependente;
+    printf("\n                                                      Cadastrar novo dependente\n");
     linha();
     printf("\n\nCPF: ");
     scanf("%s", &dependente.cpf);
@@ -172,9 +173,9 @@ Dependente popularDependente() {
     scanf("%d", &dependente.sexo);
     printf("\nData de Nascimento:\nDia: ");
     scanf("%d", &dependente.data_nascimento.dia);
-    printf("\nMes: ");
+    printf("Mes: ");
     scanf("%d", &dependente.data_nascimento.mes);
-    printf("\nAno: ");
+    printf("Ano: ");
     scanf("%d", &dependente.data_nascimento.ano);
     return dependente;
 }
@@ -186,9 +187,9 @@ Dependente popularDependente() {
 void inserir() {
     do {
         system("cls");
-        printf("\n");
+        cabecalho();
         linha();
-        printf("                                               Cadastrar novo Cliente\n");
+        printf("                                                       Cadastrar Novo Cliente\n");
         linha();
         do {
             cpfExiste = 0;
@@ -242,7 +243,8 @@ void inserir() {
         fseek(base_clientes, 0, SEEK_END);
         fwrite(&titular, sizeof(Titular), 1, base_clientes);
         system("cls");
-        printf("\nCliente cadastrado com sucesso!\n");
+        cabecalho();
+        printf("\n\nCliente cadastrado com sucesso!\n");
         printf("\nDeseja cadastrar outro Cliente?\n1 - Sim\n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
         if (resposta == 1) {
@@ -467,7 +469,7 @@ void remover() {
         system("cls");
         cabecalho();
         linha();
-        printf("\n                                                          Remover Cliente\n");
+        printf("\nRemover Cliente\n");
         linha();
         printf("\n\nCPF: ");
         scanf("%s", &cpf);
@@ -482,10 +484,12 @@ void remover() {
                 fseek(base_clientes, posicao * sizeof(Titular), SEEK_SET);
                 fwrite(&titular_aux, sizeof(Titular), 1, base_clientes);
                 system("cls");
-                printf("\nCliente removido com sucesso!\n");
+                cabecalho();
+                printf("\n\nCliente removido com sucesso!\n");
             } else {
                 system("cls");
-                printf("\nRemocao Cancelada!\n");
+                cabecalho();
+                printf("\n\nRemocao Cancelada!\n");
             }
         }
         printf("\nDeseja Remover Outro?\n1 - Sim\n0 - Nao\nResposta: ");
@@ -502,7 +506,7 @@ void alterar() {
         system("cls");
         cabecalho();
         linha();
-        printf("\n                                                      Alterar Nome do Cliente\n");
+        printf("\nAlterar Nome do Cliente\n");
         linha();
         printf("\n\nCPF: ");
         scanf("%s", &cpf);
@@ -524,10 +528,120 @@ void alterar() {
                 printf("\nNome do Cliente Alterado com Sucesso!\n");
             } else {
                 system("cls");
-                printf("\nAlteracao Cancelada!\n");
+                cabecalho();
+                printf("\n\nAlteracao Cancelada!\n");
             }
         }
         printf("\nDeseja Alterar Outro?\n1 - Sim \n0 - Nao\nResposta: ");
         scanf("%d", &resposta);
     } while (resposta == 1);
+}
+
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
+void listagemPorPlano() {
+    system("cls");
+    cabecalho();
+    linha();
+    printf("\nInsira o Plano Para a Consulta\n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha: ");
+    scanf("%d", &plano);
+    system("cls");
+    cabecalho();
+    linha();
+    printf("                                                  Listagem Por Plano\n");
+    linha();
+    printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
+    linha();
+    rewind(base_clientes);
+    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    while (feof(base_clientes) == 0) {
+        if (titular_aux.sexo != 0) {
+            if (titular_aux.plano == plano) {
+                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+                idade /= 365;
+                for (qtdDependentes = 0;
+                     qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
+                    if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "") != 0) {
+                        qtdDependentes++;
+                    } else {
+                        break;
+                    }
+                }
+                printf("%-11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
+                       titular_aux.cpf,
+                       titular_aux.nome,
+                       titular_aux.sexo,
+                       titular_aux.telefone,
+                       titular_aux.email,
+                       idade,
+                       titular_aux.plano,
+                       qtdDependentes,
+                       titular_aux.valorPlano,
+                       titular_aux.data_vencimento.dia,
+                       titular_aux.data_vencimento.mes,
+                       titular_aux.data_vencimento.ano);
+            }
+        }
+        fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    }
+    if (titular_aux.sexo == 0) {
+        printf("\n\nNao Existem Clientes Cadastrados !\n");
+    }
+    linha();
+    printf("\n\n");
+    system("pause");
+}
+
+/*
+ * Autor: Raphael Jucius
+ * E-mail: raphael.jucius@aluno.uniaeso.edu.br
+ */
+void listagemVencimento() {
+    system("cls");
+    cabecalho();
+    linha();
+    printf("                                         Listagem dos Vencimentos do Plano de Saude do Mes\n");
+    linha();
+    printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
+    linha();
+    rewind(base_clientes);
+    fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    while (feof(base_clientes) == 0) {
+        if (titular_aux.sexo != 0) {
+            if (time.wMonth == titular_aux.data_vencimento.mes && time.wYear == titular_aux.data_vencimento.ano) {
+                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+                idade /= 365;
+                for (qtdDependentes = 0;
+                     qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
+                    if (strcmp(titular_aux.dependentes[qtdDependentes].cpf, "") != 0) {
+                        qtdDependentes++;
+                    } else {
+                        break;
+                    }
+                }
+                printf("%-11s %-25s %4d %-11s %-35s %5d %5d %-4d %10.2f %d/%d/%d\n",
+                       titular_aux.cpf,
+                       titular_aux.nome,
+                       titular_aux.sexo,
+                       titular_aux.telefone,
+                       titular_aux.email,
+                       idade,
+                       titular_aux.plano,
+                       qtdDependentes,
+                       titular_aux.valorPlano,
+                       titular_aux.data_vencimento.dia,
+                       titular_aux.data_vencimento.mes,
+                       titular_aux.data_vencimento.ano);
+            }
+        }
+        fread(&titular_aux, sizeof(Titular), 1, base_clientes);
+    }
+    if (titular_aux.sexo == 0) {
+        printf("\n\nNao Existem Clientes Cadastrados !\n");
+    }
+    linha();
+    printf("\n\n");
+    system("pause");
 }
