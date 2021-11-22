@@ -10,7 +10,7 @@ typedef struct {
 typedef struct {
     char nome[30];
     int sexo;
-    Data data_nascimento;
+    Data dataNascimento;
     char cpf[11];
 } Dependente;
 
@@ -18,7 +18,7 @@ typedef struct {
     char nome[25], email[35], telefone[11];
     int sexo, plano;
     float valorPlano;
-    Data data_nascimento, data_vencimento;
+    Data dataNascimento, dataVencimento;
     Dependente dependentes[10];
     char cpf[11];
 } Titular;
@@ -81,7 +81,7 @@ int main() {
         printf("4 - Listagem Geral\n");
         printf("5 - Listagem por Plano\n");
         printf("6 - Listagem dos Vencimentos do Plano de Saude do Mes\n");
-        printf("7 - Listagem dos Dependentes por Titular\n");
+        printf("7 - (BONUS) Listagem dos Dependentes por Titular\n");
         printf("0 - Sair\n");
         linha();
         printf("\n\nInforme a opcao desejada: ");
@@ -162,7 +162,7 @@ Dependente popularDependente() {
     cabecalho();
     linha();
     Dependente dependente;
-    printf("\n                                                      Cadastrar novo dependente\n");
+    printf("\nCadastrar novo dependente\n");
     linha();
     printf("\n\nCPF: ");
     scanf("%s", &dependente.cpf);
@@ -172,11 +172,11 @@ Dependente popularDependente() {
     printf("\nSexo:\n1 - Feminino\n2 - Masculino\nEscolha:");
     scanf("%d", &dependente.sexo);
     printf("\nData de Nascimento:\nDia: ");
-    scanf("%d", &dependente.data_nascimento.dia);
+    scanf("%d", &dependente.dataNascimento.dia);
     printf("Mes: ");
-    scanf("%d", &dependente.data_nascimento.mes);
+    scanf("%d", &dependente.dataNascimento.mes);
     printf("Ano: ");
-    scanf("%d", &dependente.data_nascimento.ano);
+    scanf("%d", &dependente.dataNascimento.ano);
     return dependente;
 }
 
@@ -189,7 +189,7 @@ void inserir() {
         system("cls");
         cabecalho();
         linha();
-        printf("                                                       Cadastrar Novo Cliente\n");
+        printf("Cadastrar Novo Cliente\n");
         linha();
         do {
             cpfExiste = 0;
@@ -220,11 +220,11 @@ void inserir() {
         fflush(stdin);
         gets(titular.email);
         printf("\nData de Nascimento:\nDia: ");
-        scanf("%d", &titular.data_nascimento.dia);
+        scanf("%d", &titular.dataNascimento.dia);
         printf("Mes: ");
-        scanf("%d", &titular.data_nascimento.mes);
+        scanf("%d", &titular.dataNascimento.mes);
         printf("Ano: ");
-        scanf("%d", &titular.data_nascimento.ano);
+        scanf("%d", &titular.dataNascimento.ano);
         printf("\nPlano: \n1 - Ouro\n2 - Diamante\n3 - Prata\n4 - Esmeralda\nEscolha: ");
         scanf("%d", &titular.plano);
         int x = 0;
@@ -237,9 +237,9 @@ void inserir() {
             x++;
         } while (temDependente == 1);
         titular.valorPlano = calculaValorPlano(titular);
-        titular.data_vencimento.dia = time.wDay;
-        titular.data_vencimento.mes = time.wMonth;
-        titular.data_vencimento.ano = (time.wYear + 1);
+        titular.dataVencimento.dia = time.wDay;
+        titular.dataVencimento.mes = time.wMonth;
+        titular.dataVencimento.ano = (time.wYear + 1);
         fseek(base_clientes, 0, SEEK_END);
         fwrite(&titular, sizeof(Titular), 1, base_clientes);
         system("cls");
@@ -281,7 +281,7 @@ float calculaValorPlano(Titular titular) {
         default:
             break;
     }
-    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dataNascimento.ano - 30 * titular.dataNascimento.mes - titular.dataNascimento.dia;
     idade /= 365;
     //Aqui faz a validação somente do titular e aplica os acréscimos e descontos
     if (titular.sexo == 1 && (idade >= 13 && idade <= 35)) {
@@ -296,7 +296,7 @@ float calculaValorPlano(Titular titular) {
     //Aqui faz a validação de todos os dependentes do titular e aplica os acréscimos e descontos.
     //Para o primeiro IF, tive que adicionar a variável SEXO no dependente.
     for (int x = 0; x < qtdDependentes; x++) {
-        idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].data_nascimento.ano - 30 * titular.dependentes[x].data_nascimento.mes - titular.dependentes[x].data_nascimento.dia;
+        idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].dataNascimento.ano - 30 * titular.dependentes[x].dataNascimento.mes - titular.dependentes[x].dataNascimento.dia;
         idade /= 365;
         if (titular.dependentes[x].sexo == 1 && (idade >= 13 && idade <= 35)) {
             valorPlano *= (1 + 0.30);
@@ -318,8 +318,9 @@ float calculaValorPlano(Titular titular) {
  */
 void listagem() {
     system("cls");
+    cabecalho();
     linha();
-    printf("                                                  Listagem Geral\n");
+    printf("                                                           Listagem Geral\n");
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
@@ -327,7 +328,7 @@ void listagem() {
     fread(&titular, sizeof(Titular), 1, base_clientes);
     while (feof(base_clientes) == 0) {
         if (titular.sexo != 0) {
-            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dataNascimento.ano - 30 * titular.dataNascimento.mes - titular.dataNascimento.dia;
             idade /= 365;
             for (qtdDependentes = 0;
                  qtdDependentes < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]);) {
@@ -347,9 +348,9 @@ void listagem() {
                    titular.plano,
                    qtdDependentes,
                    titular.valorPlano,
-                   titular.data_vencimento.dia,
-                   titular.data_vencimento.mes,
-                   titular.data_vencimento.ano);
+                   titular.dataVencimento.dia,
+                   titular.dataVencimento.mes,
+                   titular.dataVencimento.ano);
         }
         fread(&titular, sizeof(Titular), 1, base_clientes);
     }
@@ -388,7 +389,7 @@ void listagemDependentes() {
     linha();
     for (int x = 0; x < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]); x++) {
         if (strcmp(titular.dependentes[x].cpf, "") != 0) {
-            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].data_nascimento.ano - 30 * titular.dependentes[x].data_nascimento.mes - titular.dependentes[x].data_nascimento.dia;
+            idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].dataNascimento.ano - 30 * titular.dependentes[x].dataNascimento.mes - titular.dependentes[x].dataNascimento.dia;
             idade /= 365;
             printf("%11s %-25s %4d %-4d\n",
                    titular.dependentes[x].cpf,
@@ -435,7 +436,7 @@ void mostre(int posicao) {
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
-    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+    idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dataNascimento.ano - 30 * titular.dataNascimento.mes - titular.dataNascimento.dia;
     idade /= 365;
     for (qtdDependentes = 0; qtdDependentes < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]);) {
         if (strcmp(titular.dependentes[qtdDependentes].cpf, "") != 0) {
@@ -454,9 +455,9 @@ void mostre(int posicao) {
            titular.plano,
            qtdDependentes,
            titular.valorPlano,
-           titular.data_vencimento.dia,
-           titular.data_vencimento.mes,
-           titular.data_vencimento.ano);
+           titular.dataVencimento.dia,
+           titular.dataVencimento.mes,
+           titular.dataVencimento.ano);
     linha();
 }
 
@@ -550,7 +551,7 @@ void listagemPorPlano() {
     system("cls");
     cabecalho();
     linha();
-    printf("                                                  Listagem Por Plano\n");
+    printf("                                                         Listagem Por Plano\n");
     linha();
     printf("CPF         Nome                      Sexo Fone        Email                               Idade Plano Dep.      Valor Venc.\n");
     linha();
@@ -559,7 +560,7 @@ void listagemPorPlano() {
     while (feof(base_clientes) == 0) {
         if (titular_aux.sexo != 0) {
             if (titular_aux.plano == plano) {
-                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dataNascimento.ano - 30 * titular.dataNascimento.mes - titular.dataNascimento.dia;
                 idade /= 365;
                 for (qtdDependentes = 0;
                      qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
@@ -579,9 +580,9 @@ void listagemPorPlano() {
                        titular_aux.plano,
                        qtdDependentes,
                        titular_aux.valorPlano,
-                       titular_aux.data_vencimento.dia,
-                       titular_aux.data_vencimento.mes,
-                       titular_aux.data_vencimento.ano);
+                       titular_aux.dataVencimento.dia,
+                       titular_aux.dataVencimento.mes,
+                       titular_aux.dataVencimento.ano);
             }
         }
         fread(&titular_aux, sizeof(Titular), 1, base_clientes);
@@ -610,8 +611,8 @@ void listagemVencimento() {
     fread(&titular_aux, sizeof(Titular), 1, base_clientes);
     while (feof(base_clientes) == 0) {
         if (titular_aux.sexo != 0) {
-            if (time.wMonth == titular_aux.data_vencimento.mes && time.wYear == titular_aux.data_vencimento.ano) {
-                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.data_nascimento.ano - 30 * titular.data_nascimento.mes - titular.data_nascimento.dia;
+            if (time.wMonth == titular_aux.dataVencimento.mes && time.wYear == titular_aux.dataVencimento.ano) {
+                idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dataNascimento.ano - 30 * titular.dataNascimento.mes - titular.dataNascimento.dia;
                 idade /= 365;
                 for (qtdDependentes = 0;
                      qtdDependentes < sizeof(titular_aux.dependentes) / sizeof(titular_aux.dependentes[0]);) {
@@ -631,9 +632,9 @@ void listagemVencimento() {
                        titular_aux.plano,
                        qtdDependentes,
                        titular_aux.valorPlano,
-                       titular_aux.data_vencimento.dia,
-                       titular_aux.data_vencimento.mes,
-                       titular_aux.data_vencimento.ano);
+                       titular_aux.dataVencimento.dia,
+                       titular_aux.dataVencimento.mes,
+                       titular_aux.dataVencimento.ano);
             }
         }
         fread(&titular_aux, sizeof(Titular), 1, base_clientes);
