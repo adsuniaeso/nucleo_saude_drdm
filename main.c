@@ -29,7 +29,7 @@ FILE *base_clientes;
 
 SYSTEMTIME time;
 
-int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar, cpfExiste, plano;
+int idade, qtdDependentes, posicao, opcao, resposta, temDependente, confirmar, cpfExiste, plano, x;
 
 float valorPlano;
 
@@ -126,7 +126,7 @@ int main() {
  * E-mail: diego.pereira@aluno.uniaeso.edu.br
  */
 void linha() {
-    for (int i = 1; i <= 130; i++) {
+    for (x = 1; x <= 130; x++) {
         printf("_");
     }
 }
@@ -295,7 +295,7 @@ float calculaValorPlano(Titular titular) {
     }
     //Aqui faz a validação de todos os dependentes do titular e aplica os acréscimos e descontos.
     //Para o primeiro IF, tive que adicionar a variável SEXO no dependente.
-    for (int x = 0; x < qtdDependentes; x++) {
+    for (x = 0; x < qtdDependentes; x++) {
         idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].dataNascimento.ano - 30 * titular.dependentes[x].dataNascimento.mes - titular.dependentes[x].dataNascimento.dia;
         idade /= 365;
         if (titular.dependentes[x].sexo == 1 && (idade >= 13 && idade <= 35)) {
@@ -387,7 +387,7 @@ void listagemDependentes() {
     linha();
     printf("CPF         Nome                      Sexo Idade\n");
     linha();
-    for (int x = 0; x < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]); x++) {
+    for (x = 0; x < sizeof(titular.dependentes) / sizeof(titular.dependentes[0]); x++) {
         if (strcmp(titular.dependentes[x].cpf, "") != 0) {
             idade = 365 * time.wYear + 30 * time.wMonth + time.wDay - 365 * titular.dependentes[x].dataNascimento.ano - 30 * titular.dependentes[x].dataNascimento.mes - titular.dependentes[x].dataNascimento.dia;
             idade /= 365;
